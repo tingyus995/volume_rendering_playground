@@ -8,6 +8,7 @@ This app displays 3D volumetric data from [this site](https://web.cs.ucdavis.edu
 * [PyOpenGL](https://pypi.org/project/PyOpenGL/)
 * [PyGLM](https://pypi.org/project/PyGLM/)
 * [numpy](https://pypi.org/project/numpy/)
+* [imgui](https://github.com/pyimgui/pyimgui)
 
 ## Deployment
 
@@ -17,6 +18,7 @@ pip install glfw
 pip install PyOpenGL
 pip install PyGLM
 pip install numpy
+pip install imgui[glfw]
 ```
 ### Run the renderer
 ```

@@ -29,6 +29,12 @@ class ShaderProgram:
     def use(self):
 
         glUseProgram(self.shader_program)
+    
+    def set_uniform1f(self, name: str, val: float):
+        glUniform1f(
+            glGetUniformLocation(self.shader_program, name),
+            val
+        )
 
     def _compile_program(self, source: str, shader_type):
         program = glCreateShader(shader_type)

@@ -153,3 +153,4 @@ cython_debug/
 
 # Volume files
 *.vol
+imgui.ini

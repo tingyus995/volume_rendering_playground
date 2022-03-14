@@ -3,6 +3,8 @@ import glfw
 import glm
 from OpenGL.GL import *
 import numpy as np
+import imgui
+from imgui.integrations.glfw import GlfwRenderer
 from shader import ShaderProgram
 from vol_parser import parse_vol_file
 
@@ -15,6 +17,8 @@ def read_program_source(path: str) -> str:
 class Window:
 
     def __init__(self) -> None:
+        # Initialize imgui
+        imgui.create_context()
 
         # Initialize the library
         if not glfw.init():
@@ -32,6 +36,8 @@ class Window:
 
         # Make the window's context current
         glfw.make_context_current(window)
+
+        self.impl = GlfwRenderer(window) 
 
         # read the volume data
         volume, dim_depth, dim_w, dim_h = parse_vol_file("Skull.vol")
@@ -99,9 +105,28 @@ class Window:
 
         deg = 0.0
 
+        # params for shader
+        delta = 0.01
+        self.shader.set_uniform1f("delta", delta)
+        stepSize = 0.01
+        self.shader.set_uniform1f("stepSize", stepSize)
+        tn = 0.0
+        self.shader.set_uniform1f("tn", tn)
+        tf = 5.0
+        self.shader.set_uniform1f("tf", tf)
+
+        # other parameters
+        rotate_speed = 150
+
+        self.last_time = glfw.get_time()
+
+
         # Loop until the user closes the window
         while not glfw.window_should_close(window):
             # Render here, e.g. using pyOpenGL
+
+            current_time = glfw.get_time()
+            delta_time = current_time - self.last_time
 
             t = glm.mat4(1.0)
             t = glm.rotate(t, glm.radians(deg), glm.vec3(0.0, 1.0, 0.0))
@@ -116,18 +141,53 @@ class Window:
                 glm.value_ptr(t)
             )
 
-            deg += 1
+            deg += rotate_speed * delta_time
 
             self.shader.use()
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT,
                            ctypes.c_void_p(0))
+            # draw UI
+            imgui.new_frame()
+            imgui.begin("Config", True)
+            changed, v = imgui.slider_float("delta", delta, max_value=5.0, min_value=0.001)
+            if changed:
+                self.shader.set_uniform1f("delta", v)
+                delta = v
+
+            changed, v = imgui.slider_float("stepSize", stepSize, max_value=0.5, min_value=0.001)
+            if changed:
+                self.shader.set_uniform1f("stepSize", v)
+                stepSize = v
+
+            changed, v = imgui.slider_float("tn", tn, max_value=5.0, min_value=0.0)
+            if changed:
+                self.shader.set_uniform1f("tn", v)
+                tn = v
+
+            changed, v = imgui.slider_float("tf", tf, max_value=5.0, min_value=0.0)
+            if changed:
+                self.shader.set_uniform1f("tf", v)
+                tf = v
+
+            changed, v = imgui.slider_int("rotate speed", rotate_speed, max_value=300, min_value=0)
+            if changed:
+                rotate_speed = v
+            imgui.end()
+
+            # imgui.show_demo_window()
+
+            imgui.render()
+            self.impl.render(imgui.get_draw_data())
 
             # Swap front and back buffers
             glfw.swap_buffers(window)
 
             # Poll for and process events
             glfw.poll_events()
+            # Imgui
+            self.impl.process_inputs()
+            self.last_time = current_time
 
         glfw.terminate()
 
