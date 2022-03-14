@@ -1,4 +1,6 @@
 #version 330 core
+#define STEP_SIZE 0.01
+#define DELTA 0.1
 in vec3 planeCoord;
 out vec4 FragColor;
 
@@ -17,22 +19,23 @@ void main()
     vec3 rayBegin = cameraPos + rayDirection * tn;
     vec3 rayEnd = cameraPos + rayDirection * tf;
 
-    float max = 0.0;
+    float c = 0.0;
+    float accumulated_t = 0;
 
-    for(float i = tn; i <= tf; i += 0.01f){
+    for(float i = tn; i <= tf; i += STEP_SIZE){
 
         vec3 pos = cameraPos + rayDirection * i;
 
         vec3 queryPoint = (camTransform * vec4(pos.x, pos.y, pos.z, 1.0)).xyz;
         vec4 result = texture(volumeTexture, vec3(queryPoint.x + 0.5, queryPoint.y + 0.5, queryPoint.z + 0.5));
-        
 
-        if(result.x > max){
-            max = result.x;
-        }
+        float t = exp(-accumulated_t * DELTA);
+
+        c += t * (1 - exp(-result.x * DELTA)); 
+        accumulated_t += result.x;
 
     }
 
-    FragColor = vec4(max, max, max, 1.0f);
+    FragColor = vec4(c, c, c, 1.0);
 
 } 
