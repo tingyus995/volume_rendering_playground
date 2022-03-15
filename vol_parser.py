@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 def parse_vol_file(path: str):
 
@@ -21,7 +20,7 @@ def parse_vol_file(path: str):
     return raw_data, dim_x, dim_y, dim_z
 
 if __name__ == "__main__":
-
+    import matplotlib.pyplot as plt
     raw_data, _, _, _ = parse_vol_file("Skull.vol")
     print(raw_data.shape)
     plt.imshow(raw_data[40])
