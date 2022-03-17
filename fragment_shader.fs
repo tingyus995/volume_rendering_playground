@@ -12,11 +12,7 @@ uniform float tf;
 
 void main()
 {
-    mat4 mymat = mat4(1.0);
     vec3 rayDirection = normalize(planeCoord- cameraPos);
-
-    vec3 rayBegin = cameraPos + rayDirection * tn;
-    vec3 rayEnd = cameraPos + rayDirection * tf;
 
     float c = 0.0;
     float accumulated_t = 0;
