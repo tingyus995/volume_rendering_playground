@@ -15,12 +15,14 @@ This app displays 3D volumetric data from [this site](https://web.cs.ucdavis.edu
 ### Install dependencies
 ```
 pip install glfw
-pip install PyOpenGL
+pip install PyOpenGL PyOpenGL_accelerate
 pip install PyGLM
 pip install numpy
 pip install imgui[glfw]
 ```
 ### Run the renderer
+1. Download and extract the skull volume file from [here](https://web.cs.ucdavis.edu/~okreylos/PhDStudies/Spring2000/ECS277/Skull.vol.gz) into the project directory.
+2. Run
 ```
 python renderer.py
 ```
